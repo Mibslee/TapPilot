@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="500" viewBox="0 0 900 500">
+  <rect width="900" height="500" rx="28" fill="#f4f4f6"/>
+  <text x="48" y="58" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="26" font-weight="650" fill="#17171a">“指驭”状态栏图标新方向</text>
+  <text x="48" y="91" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="16" fill="#6e6e73">大手机是主角，小电脑表示远程连接；点击动作控制在手机屏幕内部</text>
+  <g transform="translate(48 122)">
+    <rect width="804" height="154" rx="18" fill="#fff"/>
+    <text x="24" y="32" font-family="-apple-system,sans-serif" font-size="15" font-weight="650" fill="#17171a">D · 触点波纹</text>
+    <image href="status-icon-d.svg" x="34" y="54" width="30" height="23"/>
+    <image href="status-icon-d.svg" x="116" y="32" width="132" height="99"/>
+    <text x="286" y="65" font-family="-apple-system,sans-serif" font-size="19" font-weight="650" fill="#17171a">最克制，完全不画手</text>
+    <text x="286" y="96" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">实心触点 + 单层反馈圈；小尺寸最干净</text>
+    <text x="286" y="123" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">略偏抽象，但不会出现奇怪肢体轮廓</text>
+  </g>
+  <g transform="translate(48 292)">
+    <rect width="804" height="154" rx="18" fill="#fff"/>
+    <text x="24" y="32" font-family="-apple-system,sans-serif" font-size="15" font-weight="650" fill="#17171a">E · 极简指尖</text>
+    <image href="status-icon-e.svg" x="34" y="54" width="30" height="23"/>
+    <image href="status-icon-e.svg" x="116" y="32" width="132" height="99"/>
+    <text x="286" y="65" font-family="-apple-system,sans-serif" font-size="19" font-weight="650" fill="#17171a">“指驭”含义更直接</text>
+    <text x="286" y="96" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">只保留一根指尖和点击圈，并限制在手机内部</text>
+    <text x="286" y="123" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">比旧版轻很多，但细节会比 D 多一点</text>
+  </g>
+</svg>

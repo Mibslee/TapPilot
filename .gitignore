@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.build/
+.codex/
+:-
+.DS_Store
+.env
+.env.*
+.tappilot/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo

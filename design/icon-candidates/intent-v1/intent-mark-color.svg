@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="device" x1="62" y1="92" x2="446" y2="416" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6428D8"/>
+      <stop offset=".48" stop-color="#B747B0"/>
+      <stop offset="1" stop-color="#FF7A20"/>
+    </linearGradient>
+    <linearGradient id="phone" x1="282" y1="132" x2="432" y2="426" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8433"/>
+      <stop offset="1" stop-color="#FF6818"/>
+    </linearGradient>
+  </defs>
+  <rect x="54" y="82" width="294" height="242" rx="34" fill="none" stroke="url(#device)" stroke-width="30"/>
+  <path d="M180 326v48M132 386h144" fill="none" stroke="url(#device)" stroke-width="30" stroke-linecap="round"/>
+  <rect x="264" y="126" width="184" height="316" rx="50" fill="url(#phone)"/>
+  <circle cx="350" cy="258" r="39" fill="none" stroke="#fff" stroke-width="21"/>
+  <path d="M350 258v126" fill="none" stroke="#fff" stroke-width="30" stroke-linecap="round"/>
+  <path d="M350 326c10-11 27-9 35 4 9-9 25-5 31 8 11-5 25 2 29 15l9 42c5 24-14 47-39 47h-35c-28 0-50-22-50-50v-42c0-14 9-24 20-24Z" fill="#fff"/>
+</svg>

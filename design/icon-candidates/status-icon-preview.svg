@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="520" viewBox="0 0 900 520">
+  <rect width="900" height="520" rx="28" fill="#f4f4f6"/>
+  <text x="48" y="58" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="26" font-weight="650" fill="#17171a">TapPilot 状态栏图标候选</text>
+  <text x="48" y="91" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="16" fill="#6e6e73">左侧为菜单栏实际尺寸，右侧为放大结构；全部采用单色模板图标</text>
+  <g transform="translate(48 122)">
+    <rect width="804" height="106" rx="18" fill="#fff"/>
+    <text x="24" y="64" font-family="-apple-system,sans-serif" font-size="28" font-weight="700">A</text>
+    <image href="status-icon-a.svg" x="87" y="40" width="30" height="23"/>
+    <image href="status-icon-a.svg" x="176" y="20" width="88" height="66"/>
+    <text x="300" y="48" font-family="-apple-system,sans-serif" font-size="19" font-weight="650">桌面显示器 + 手机</text>
+    <text x="300" y="76" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">最稳、最清楚，设备并列，不互相遮挡</text>
+  </g>
+  <g transform="translate(48 244)">
+    <rect width="804" height="106" rx="18" fill="#fff"/>
+    <text x="24" y="64" font-family="-apple-system,sans-serif" font-size="28" font-weight="700">B</text>
+    <image href="status-icon-b.svg" x="87" y="40" width="30" height="23"/>
+    <image href="status-icon-b.svg" x="176" y="20" width="88" height="66"/>
+    <text x="300" y="48" font-family="-apple-system,sans-serif" font-size="19" font-weight="650">MacBook + 手机</text>
+    <text x="300" y="76" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">更像 Mac 客户端，但底座在极小尺寸下略细</text>
+  </g>
+  <g transform="translate(48 366)">
+    <rect width="804" height="106" rx="18" fill="#fff"/>
+    <text x="24" y="64" font-family="-apple-system,sans-serif" font-size="28" font-weight="700">C</text>
+    <image href="status-icon-c.svg" x="87" y="40" width="30" height="23"/>
+    <image href="status-icon-c.svg" x="176" y="20" width="88" height="66"/>
+    <text x="300" y="48" font-family="-apple-system,sans-serif" font-size="19" font-weight="650">电脑 + 前置手机</text>
+    <text x="300" y="76" font-family="-apple-system,sans-serif" font-size="15" fill="#6e6e73">最紧凑，图标面积利用最大，但有少量重叠</text>
+  </g>
+</svg>

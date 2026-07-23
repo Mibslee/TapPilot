@@ -1,0 +1,14 @@
+{
+  "name": "指驭 · TapPilot",
+  "short_name": "指驭",
+  "description": "从手机查看、继续和批准 Mac 上的 Codex 任务",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f9fb",
+  "theme_color": "#f8f9fb",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "/brand/shanestudio-mark-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/brand/shanestudio-mark-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

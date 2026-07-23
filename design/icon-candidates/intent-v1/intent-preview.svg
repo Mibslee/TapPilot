@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <defs>
+    <linearGradient id="title" x1="60" y1="0" x2="320" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6428D8"/><stop offset="1" stop-color="#FF7417"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="760" rx="34" fill="#F6F6F8"/>
+  <g transform="translate(72 52)">
+    <image href="intent-mark-color.svg" x="0" y="0" width="184" height="184"/>
+    <text x="205" y="91" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" font-size="68" font-weight="750" fill="#202127">指驭</text>
+    <text x="210" y="130" font-family="-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif" font-size="20" letter-spacing="5" fill="#75777D">指尖掌控 · 驭见高效</text>
+    <rect x="205" y="151" width="232" height="5" rx="3" fill="url(#title)"/>
+  </g>
+  <g transform="translate(58 250)">
+    <rect width="334" height="446" rx="24" fill="#fff"/>
+    <text x="26" y="42" font-family="-apple-system,'PingFang SC',sans-serif" font-size="17" font-weight="650" fill="#24252A">电脑端彩色 App 图标</text>
+    <image href="intent-app-icon.svg" x="42" y="76" width="250" height="250"/>
+    <text x="26" y="370" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">渐变底色承载品牌识别</text>
+    <text x="26" y="398" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">手机在前、电脑在后，点击动作完整</text>
+  </g>
+  <g transform="translate(432 250)">
+    <rect width="334" height="446" rx="24" fill="#fff"/>
+    <text x="26" y="42" font-family="-apple-system,'PingFang SC',sans-serif" font-size="17" font-weight="650" fill="#24252A">Mac 顶栏单色 Logo</text>
+    <rect x="42" y="86" width="250" height="80" rx="14" fill="#ECEDEF"/>
+    <text x="62" y="134" font-family="-apple-system,sans-serif" font-size="14" fill="#666970">Wi-Fi</text>
+    <image href="intent-menubar.svg" x="152" y="111" width="24" height="18"/>
+    <text x="190" y="134" font-family="-apple-system,sans-serif" font-size="14" fill="#222328">TapPilot</text>
+    <image href="intent-menubar.svg" x="91" y="202" width="152" height="114"/>
+    <text x="26" y="370" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">使用同一轮廓的光学简化版</text>
+    <text x="26" y="398" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">电脑轮廓在手机后终止，不再穿透镂空手势</text>
+  </g>
+  <g transform="translate(806 250)">
+    <rect width="334" height="446" rx="24" fill="#fff"/>
+    <text x="26" y="42" font-family="-apple-system,'PingFang SC',sans-serif" font-size="17" font-weight="650" fill="#24252A">手机端彩色 Logo</text>
+    <image href="intent-mark-color.svg" x="42" y="76" width="250" height="250"/>
+    <text x="26" y="370" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">透明背景，可用于首页和启动页</text>
+    <text x="26" y="398" font-family="-apple-system,'PingFang SC',sans-serif" font-size="15" fill="#777980">保留紫橙双色与白色点击手势</text>
+  </g>
+</svg>
