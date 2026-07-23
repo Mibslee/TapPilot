@@ -83,14 +83,65 @@ export interface SystemInfo {
 export interface ModuleInfo {
   id: string;
   name: string;
-  state: "connected" | "readOnly" | "planned";
+  state: "connected" | "offline" | "readOnly" | "available" | "planned";
+}
+
+export interface PairedDevice {
+  id: string;
+  label: string;
+  platform: "phone" | "tablet" | "computer" | "unknown";
+  route: "本机" | "Tailscale";
+  createdAt: string;
+  lastSeenAt: string;
+}
+
+export interface BridgeStatus {
+  online: boolean;
+  codexOnline: boolean;
+  tailscaleListening: boolean;
+}
+
+export type GhosttyStatus = "ready" | "notRunning" | "notInstalled" | "unsupported" | "needsAutomationPermission" | "unavailable";
+
+export interface GhosttyTerminal {
+  id: string;
+  title: string;
+  workingDirectory: string;
+}
+
+export interface GhosttyRelay {
+  id: string;
+  terminalId: string;
+  startedAt: string;
+  status: "capturing" | "stopped";
+}
+
+export interface GhosttyOutput {
+  relay: GhosttyRelay;
+  cursor: number;
+  hasMore: boolean;
+  text: string;
+}
+
+export interface GhosttySnapshot {
+  installed: boolean;
+  version: string | null;
+  running: boolean;
+  status: GhosttyStatus;
+  detail: string;
+  terminals: GhosttyTerminal[];
+  relays: GhosttyRelay[];
 }
 
 export interface BootstrapData {
   connected: boolean;
+  bridge: BridgeStatus;
   threads: CodexThread[];
   rateLimits: RateLimitSnapshot | null;
   approvals: PendingApproval[];
+  pairedDevices: PairedDevice[];
+  currentDeviceId: string | null;
+  ghostty: GhosttySnapshot;
   system: SystemInfo;
   modules: ModuleInfo[];
 }

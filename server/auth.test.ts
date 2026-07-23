@@ -33,4 +33,24 @@ describe("pairing credential rotation", () => {
     expect(auth.pair(oldCode, response)).toBe(false);
     expect(auth.isAuthenticated({ headers: { cookie } } as IncomingMessage)).toBe(false);
   });
+
+  it("issues revocable credentials per paired device without evicting another device", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "tappilot-auth-"));
+    temporaryDirectories.push(directory);
+    process.env.TAPPILOT_STATE_DIR = directory;
+    const auth = await import("./auth.js");
+    const cookies: string[] = [];
+    const response = {
+      setHeader: (_name: string, value: string) => { cookies.push(value.split(";")[0]); },
+    } as unknown as ServerResponse;
+
+    expect(auth.pair(auth.pairingCode, response, { label: "iPhone · Safari", platform: "phone", route: "Tailscale" })).toBe(true);
+    expect(auth.pair(auth.pairingCode, response, { label: "Mac · Safari", platform: "computer", route: "本机" })).toBe(true);
+    const devices = auth.listPairedDevices();
+    expect(devices).toHaveLength(2);
+    expect(auth.isAuthenticated({ headers: { cookie: cookies[0] } } as IncomingMessage)).toBe(true);
+    expect(auth.removePairedDevice(devices.find((device) => device.label.startsWith("iPhone"))!.id)).toBe(true);
+    expect(auth.isAuthenticated({ headers: { cookie: cookies[0] } } as IncomingMessage)).toBe(false);
+    expect(auth.isAuthenticated({ headers: { cookie: cookies[1] } } as IncomingMessage)).toBe(true);
+  });
 });

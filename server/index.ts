@@ -5,7 +5,8 @@ import { dirname, extname, join, normalize, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { WebSocketServer, WebSocket } from "ws";
 import { CodexClient } from "./codexClient.js";
-import { isAuthenticated, pair, pairingCode, rotatePairingCredentials, stateDirectory } from "./auth.js";
+import { GhosttyClient, GhosttyError } from "./ghosttyClient.js";
+import { authenticatedDevice, clearDeviceCookie, isAuthenticated, listPairedDevices, pair, pairingCode, removePairedDevice, rotatePairingCredentials, stateDirectory, touchAuthenticatedDevice } from "./auth.js";
 import { syncThreadToDesktop } from "./desktopSync.js";
 import { listDirectories, readSystemInfo } from "./systemInfo.js";
 import { cleanupStaleImages, deleteImage, MAX_IMAGE_BYTES, resolveImages, storeImage } from "./uploads.js";
@@ -23,6 +24,7 @@ const webRoot = [
 const runtimeStatusPath = join(stateDirectory, "runtime.json");
 const runtimeStatusTemporaryPath = join(stateDirectory, `runtime-${process.pid}.tmp`);
 const codex = new CodexClient();
+const ghostty = new GhosttyClient();
 const sockets = new Set<WebSocket>();
 type ConnectedDevice = {
   id: string;
@@ -32,6 +34,7 @@ type ConnectedDevice = {
   connectedAt: string;
 };
 const connectedDevices = new Map<string, { device: ConnectedDevice; connections: number }>();
+const relayOutputCursors = new Map<string, number>();
 const startedAt = new Date().toISOString();
 let codexConnected = false;
 let tailscaleListening = false;
@@ -57,6 +60,7 @@ function writeRuntimeStatus(): void {
     tailscaleUrl: tailscaleHost ? `http://${tailscaleHost}:${port}` : null,
     tailscaleListening,
     connectedDevices: [...connectedDevices.values()].map(({ device }) => device),
+    pairedDeviceCount: listPairedDevices().length,
   };
   writeFileSync(runtimeStatusTemporaryPath, JSON.stringify(status, null, 2), { mode: 0o600 });
   renameSync(runtimeStatusTemporaryPath, runtimeStatusPath);
@@ -138,6 +142,33 @@ function broadcast(type: string, payload: unknown): void {
   }
 }
 
+// Output is read once inside the Bridge and announced only when its byte cursor
+// advances. Phones fetch their own bounded delta after that announcement, so
+// an idle terminal no longer creates a 900 ms polling loop in every browser.
+async function announceGhosttyOutput(): Promise<void> {
+  const activeTerminalIds = new Set(ghostty.activeRelayTerminalIds());
+  for (const terminalId of [...relayOutputCursors.keys()]) {
+    if (!activeTerminalIds.has(terminalId)) relayOutputCursors.delete(terminalId);
+  }
+  for (const terminalId of activeTerminalIds) {
+    try {
+      const page = ghostty.readRelayOutput(terminalId, relayOutputCursors.get(terminalId));
+      const previousCursor = relayOutputCursors.get(terminalId);
+      relayOutputCursors.set(terminalId, page.cursor);
+      if (previousCursor !== undefined && page.cursor !== previousCursor) {
+        broadcast("ghosttyOutput", { terminalId, cursor: page.cursor });
+      } else if (previousCursor === undefined && page.cursor > 0) {
+        broadcast("ghosttyOutput", { terminalId, cursor: page.cursor });
+      }
+    } catch {
+      relayOutputCursors.delete(terminalId);
+    }
+  }
+}
+
+const ghosttyOutputTimer = setInterval(() => void announceGhosttyOutput(), 350);
+ghosttyOutputTimer.unref();
+
 function mime(path: string): string {
   return ({
     ".html": "text/html; charset=utf-8",
@@ -171,7 +202,7 @@ const requestHandler = async (request: IncomingMessage, response: ServerResponse
 
     if (url.pathname === "/api/pair" && request.method === "POST") {
       const payload = await body(request);
-      if (!pair(String(payload.code ?? ""), response)) {
+      if (!pair(String(payload.code ?? ""), response, describeDevice(request))) {
         sendJson(response, 401, { error: "配对码不正确" });
         return;
       }
@@ -184,27 +215,130 @@ const requestHandler = async (request: IncomingMessage, response: ServerResponse
       return;
     }
 
+    // Keep the device registry useful without persisting on every static file
+    // request. This only touches an authenticated API request at most once a minute.
+    const currentDevice = touchAuthenticatedDevice(request);
+
     if (url.pathname === "/api/bootstrap") {
-      const [threads, rateLimits, system] = await Promise.all([
+      const [threads, rateLimits, system, ghosttySnapshot] = await Promise.all([
         codex.listThreads(5),
         codex.rateLimits().catch(() => null),
         readSystemInfo(),
+        ghostty.snapshot(),
       ]);
       sendJson(response, 200, {
-        connected: true,
+        connected: codexConnected,
+        bridge: {
+          online: true,
+          codexOnline: codexConnected,
+          tailscaleListening,
+        },
         codexConnectionMode: codex.connectionMode,
         threads,
         rateLimits,
         approvals: codex.listApprovals(),
+        pairedDevices: listPairedDevices(),
+        currentDeviceId: currentDevice?.id ?? authenticatedDevice(request)?.id ?? null,
+        ghostty: ghosttySnapshot,
         system,
         modules: [
-          { id: "codex", name: "Codex", state: "connected" },
+          { id: "codex", name: "Codex", state: codexConnected ? "connected" : "offline" },
           { id: "system", name: "系统设置", state: "readOnly" },
+          { id: "ghostty", name: "Ghostty", state: ghosttySnapshot.installed ? "available" : "planned" },
           { id: "minimax", name: "MiniMax Code", state: "planned" },
-          { id: "ghostty", name: "Ghostty", state: "planned" },
           { id: "kaku", name: "Kaku", state: "planned" },
         ],
       });
+      return;
+    }
+
+    if (url.pathname === "/api/devices" && request.method === "GET") {
+      sendJson(response, 200, {
+        devices: listPairedDevices(),
+        currentDeviceId: currentDevice?.id ?? authenticatedDevice(request)?.id ?? null,
+      });
+      return;
+    }
+
+    const pairedDeviceMatch = url.pathname.match(/^\/api\/devices\/([^/]+)$/);
+    if (pairedDeviceMatch && request.method === "DELETE") {
+      const id = decodeURIComponent(pairedDeviceMatch[1]);
+      if (!removePairedDevice(id)) throw new RequestError("该设备已被移除或不存在", 404);
+      if (currentDevice?.id === id) clearDeviceCookie(response);
+      sendJson(response, 200, { ok: true });
+      broadcast("devicesChanged", { removedId: id });
+      return;
+    }
+
+    if (url.pathname === "/api/ghostty" && request.method === "GET") {
+      sendJson(response, 200, await ghostty.snapshot());
+      return;
+    }
+
+    if (url.pathname === "/api/ghostty/dedicated-relay" && request.method === "POST") {
+      try {
+        const terminal = await ghostty.createDedicatedTerminal();
+        const relay = await ghostty.startRelay(terminal.id);
+        relayOutputCursors.delete(terminal.id);
+        broadcast("ghosttyRelay", { terminalId: terminal.id, status: "capturing" });
+        sendJson(response, 201, { terminal, relay });
+      } catch (error) {
+        if (error instanceof GhosttyError) throw new RequestError(error.message, error.status);
+        throw error;
+      }
+      return;
+    }
+
+    const ghosttyInputMatch = url.pathname.match(/^\/api\/ghostty\/terminals\/([^/]+)\/input$/);
+    if (ghosttyInputMatch && request.method === "POST") {
+      const payload = await body(request);
+      try {
+        await ghostty.sendText(decodeURIComponent(ghosttyInputMatch[1]), String(payload.text ?? ""));
+      } catch (error) {
+        if (error instanceof GhosttyError) throw new RequestError(error.message, error.status);
+        throw error;
+      }
+      sendJson(response, 202, { ok: true });
+      return;
+    }
+
+    const ghosttyRelayMatch = url.pathname.match(/^\/api\/ghostty\/terminals\/([^/]+)\/relay$/);
+    if (ghosttyRelayMatch && request.method === "POST") {
+      try {
+        const relay = await ghostty.startRelay(decodeURIComponent(ghosttyRelayMatch[1]));
+        relayOutputCursors.delete(relay.terminalId);
+        broadcast("ghosttyRelay", { terminalId: relay.terminalId, status: "capturing" });
+        sendJson(response, 201, relay);
+      } catch (error) {
+        if (error instanceof GhosttyError) throw new RequestError(error.message, error.status);
+        throw error;
+      }
+      return;
+    }
+
+    if (ghosttyRelayMatch && request.method === "DELETE") {
+      try {
+        const relay = await ghostty.stopRelay(decodeURIComponent(ghosttyRelayMatch[1]));
+        relayOutputCursors.delete(relay.terminalId);
+        broadcast("ghosttyRelay", { terminalId: relay.terminalId, status: "stopped" });
+        sendJson(response, 200, relay);
+      } catch (error) {
+        if (error instanceof GhosttyError) throw new RequestError(error.message, error.status);
+        throw error;
+      }
+      return;
+    }
+
+    const ghosttyOutputMatch = url.pathname.match(/^\/api\/ghostty\/terminals\/([^/]+)\/output$/);
+    if (ghosttyOutputMatch && request.method === "GET") {
+      try {
+        const rawCursor = url.searchParams.get("cursor");
+        const cursor = rawCursor === null ? undefined : Number(rawCursor);
+        sendJson(response, 200, ghostty.readRelayOutput(decodeURIComponent(ghosttyOutputMatch[1]), cursor));
+      } catch (error) {
+        if (error instanceof GhosttyError) throw new RequestError(error.message, error.status);
+        throw error;
+      }
       return;
     }
 
@@ -358,7 +492,11 @@ attachUpgradeHandler(server);
 
 wss.on("connection", (socket, request) => {
   sockets.add(socket);
-  const device = describeDevice(request);
+  const observed = describeDevice(request);
+  const pairedDevice = authenticatedDevice(request);
+  const device: ConnectedDevice = pairedDevice
+    ? { ...pairedDevice, route: observed.route, connectedAt: new Date().toISOString() }
+    : observed;
   const existing = connectedDevices.get(device.id);
   connectedDevices.set(device.id, existing
     ? { device: { ...existing.device, route: device.route }, connections: existing.connections + 1 }

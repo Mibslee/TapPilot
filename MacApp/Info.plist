@@ -24,9 +24,11 @@
     <string>14.0</string>
     <key>LSUIElement</key>
     <true/>
-    <key>NSHighResolutionCapable</key>
-    <true/>
-    <key>NSLocalNetworkUsageDescription</key>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>TapPilot 需要在你确认后控制 Ghostty：创建受控终端、发送命令并同步后续普通输出。</string>
+	<key>NSLocalNetworkUsageDescription</key>
     <string>TapPilot 需要在本机与 Tailscale 网络中提供手机访问和任务同步服务。</string>
 </dict>
 </plist>

@@ -1,4 +1,4 @@
-import type { BootstrapData, CodexThread, DirectoryListing, UploadAttachment } from "./types";
+import type { BootstrapData, CodexThread, DirectoryListing, GhosttyOutput, GhosttyRelay, GhosttySnapshot, UploadAttachment } from "./types";
 
 export const bridgeUnavailableMessage = "与 Mac 的连接短暂中断，正在自动重连…";
 
@@ -38,6 +38,16 @@ export const api = {
   health: () => request<{ ok: boolean; paired: boolean }>("/api/health"),
   pair: (code: string) => request<{ ok: boolean }>("/api/pair", { method: "POST", body: JSON.stringify({ code }) }),
   bootstrap: () => request<BootstrapData>("/api/bootstrap"),
+  ghostty: () => request<GhosttySnapshot>("/api/ghostty"),
+  startDedicatedGhosttyRelay: () => request<{ terminal: { id: string; title: string; workingDirectory: string }; relay: GhosttyRelay }>("/api/ghostty/dedicated-relay", { method: "POST" }),
+  sendGhosttyInput: (terminalId: string, text: string) => request<{ ok: boolean }>(`/api/ghostty/terminals/${encodeURIComponent(terminalId)}/input`, {
+    method: "POST",
+    body: JSON.stringify({ text }),
+  }),
+  startGhosttyRelay: (terminalId: string) => request<GhosttyRelay>(`/api/ghostty/terminals/${encodeURIComponent(terminalId)}/relay`, { method: "POST" }),
+  stopGhosttyRelay: (terminalId: string) => request<GhosttyRelay>(`/api/ghostty/terminals/${encodeURIComponent(terminalId)}/relay`, { method: "DELETE" }),
+  ghosttyOutput: (terminalId: string, cursor?: number) => request<GhosttyOutput>(`/api/ghostty/terminals/${encodeURIComponent(terminalId)}/output${cursor === undefined ? "" : `?cursor=${cursor}`}`),
+  removeDevice: (id: string) => request<{ ok: boolean }>(`/api/devices/${encodeURIComponent(id)}`, { method: "DELETE" }),
   thread: (id: string) => request<CodexThread>(`/api/threads/${encodeURIComponent(id)}`),
   send: (id: string, text: string, attachmentIds: string[] = []) => request<{ ok: boolean }>(`/api/threads/${encodeURIComponent(id)}/messages`, {
     method: "POST",

@@ -1,15 +1,36 @@
 <p align="center">
-  <img src="public/icons/tappilot-512.png" width="112" alt="TapPilot 图标：手机操控电脑" />
+  <img src="public/icons/tappilot-512.png" width="104" alt="TapPilot 图标：手机操控电脑" />
 </p>
 
 <h1 align="center">TapPilot · 指驭</h1>
 
 <p align="center">
-  把 Mac 上的 Codex 任务，变成适合手机直接阅读、继续、批准和发送图片的私有控制界面。
+  <strong>让正在 Mac 上运行的 AI 工作，变成手机上看得懂、点得准、随时能接管的私有控制台。</strong>
 </p>
 
 <p align="center">
-  <strong>Mac 菜单栏 App</strong> · <strong>手机 / 折叠屏 PWA</strong> · <strong>Tailscale 私有网络</strong>
+  Mac 菜单栏 App · 手机 / 折叠屏 PWA · Tailscale 私有网络 · 语义化 Bridge
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/macOS-14%2B-0B1020?style=flat-square&logo=apple&logoColor=white" alt="macOS 14+" />
+  <img src="https://img.shields.io/badge/Phone-PWA-1E56FF?style=flat-square&logo=pwa&logoColor=white" alt="手机 PWA" />
+  <img src="https://img.shields.io/badge/Network-Tailscale%20Private-00A2E0?style=flat-square&logo=tailscale&logoColor=white" alt="Tailscale 私有网络" />
+  <img src="https://img.shields.io/badge/Bridge-Codex%20Semantic-111827?style=flat-square" alt="Codex 语义 Bridge" />
+  <img src="https://img.shields.io/badge/Terminal-Ghostty%201.3%2B-5B5BD6?style=flat-square" alt="Ghostty 1.3+" />
+  <img src="https://img.shields.io/badge/License-MIT-14A85A?style=flat-square" alt="MIT License" />
+</p>
+
+<p align="center">
+  <a href="#开始使用">Quick Start</a> ·
+  <a href="#界面预览">Screens</a> ·
+  <a href="#ghostty-手机终端">Ghostty</a> ·
+  <a href="#安全模型为什么必须配合-tailscale">Security</a> ·
+  <a href="#路线图">Roadmap</a>
+</p>
+
+<p align="center">
+  <sub>由 <img src="public/brand/shanestudio-wordmark.png" height="16" alt="ShaneStudio" /> 独立研发</sub>
 </p>
 
 > [!WARNING]
@@ -25,9 +46,11 @@
 - [开始使用](#开始使用)
 - [把网页添加到手机桌面](#把网页添加到手机桌面)
 - [手机端怎么用](#手机端怎么用)
+- [Ghostty 手机终端](#ghostty-手机终端)
 - [macOS 菜单栏 App](#macos-菜单栏-app)
 - [配置、开发与验证](#配置开发与验证)
 - [已知边界](#已知边界)
+- [开源许可](#开源许可)
 
 ## 它解决什么问题？
 
@@ -56,41 +79,41 @@ TapPilot 的目标不是远程桌面，而是把 **Codex 的结构化语义**翻
 | 继续与中断 | 后续指令、运行中插话、停止任务 | 保持 Codex 的任务/Turn 语义，不模拟桌面点击 |
 | 图片 | PNG / JPEG / WebP 上传，单张最多 8 MB | 手机图片可送入 Codex；电脑端的对话图片也会安全映射到手机查看 |
 | 批准与问题 | 命令、文件、网络等 Codex 审批；结构化补充问题 | 支持本次或本任务会话范围内的批准；不伪装 macOS 系统授权 |
+| Ghostty 终端 | 列出会话、工作目录、发送命令与后续输出同步 | 使用 Ghostty 1.3+ 的官方 AppleScript 接口；默认新建受控标签页后再记录，接管已有终端必须二次确认；手机显示之后的普通命令与输出，停止同步会退出子 shell 并删除本次记录 |
 | Mac 信息 | “关于本机”只读卡片 | 仅展示，不提供远程系统设置修改 |
-| 设备感知 | 显示当前接入设备和来源路径 | 可识别本机 / Tailscale、手机 / 平板 / 电脑浏览器 |
+| 设备管理 | 每台浏览器独立令牌、设备列表与单台移除 | 可识别本机 / Tailscale、手机 / 平板 / 电脑浏览器；移除后该设备需重新配对 |
 | PWA | 手机桌面图标、窄屏与折叠屏布局 | 当前采用浏览器模式，方便 iPhone、Android 与折叠屏直接使用 |
 
-### 计划中的能力
+### 路线图
 
 这些不是已经承诺的发布日期，而是按照“先稳定 Codex、再扩展 Mac 能力”的方向：
 
-- 每台设备独立令牌、设备列表和单台设备移除；
-- MiniMax Code、终端、常用 App 的独立适配器；
+- MiniMax Code、Kaku、常用 App 的独立适配器；
 - 更完整的通知与待审批提醒；
 - 更丰富的文件选择/预览能力，以及更清晰的远程与本机授权边界；
 - 视真实使用频率决定是否开发 iOS / Android 原生客户端。当前优先保持 PWA：少安装步骤、跨平台、迭代快。
 
 ## 界面预览
 
-所有截图均来自 TapPilot 的真实界面；Mac 截图中的连接地址和配对码已脱敏，任务截图使用专门的安全测试任务，不包含真实项目内容。
+所有截图均来自正在运行的 TapPilot；对话使用专门的安全测试任务，工作目录已作 `~` 紧凑化处理，不包含真实项目、地址、配对码或设备令牌。
 
 <table>
   <tr>
-    <td width="33%"><img src="docs/images/macos-menu-panel.png" alt="TapPilot macOS 菜单栏面板" /></td>
-    <td width="33%"><img src="docs/images/mobile-home.png" alt="TapPilot 手机首页" /></td>
-    <td width="33%"><img src="docs/images/mobile-task.png" alt="TapPilot 手机任务对话" /></td>
+    <td width="38%"><img src="docs/images/mobile-task-current.png" alt="TapPilot 当前手机 Codex 对话界面" /></td>
+    <td width="38%"><img src="docs/images/mobile-ghostty.png" alt="TapPilot 当前手机 Ghostty 界面" /></td>
+    <td width="24%"><img src="public/icons/tappilot-512.png" alt="TapPilot 指驭图标" /></td>
   </tr>
   <tr>
-    <td align="center"><strong>Mac 菜单栏</strong><br />服务状态、私有访问地址、配对与设备信息</td>
-    <td align="center"><strong>普通直板机</strong><br />首页聚合状态和能力入口</td>
-    <td align="center"><strong>手机任务页</strong><br />聊天时间线、附件与任务控制</td>
+    <td align="center"><strong>Codex 时间线</strong><br />消息、图片、工具活动与后续指令</td>
+    <td align="center"><strong>Ghostty 终端</strong><br />新建受控标签页、实时输出与安全接管</td>
+    <td align="center"><strong>指驭</strong><br />手机点触，Mac 执行</td>
   </tr>
 </table>
 
 <p align="center">
-  <img src="docs/images/foldable-task.png" alt="TapPilot 折叠屏展开态任务界面" width="100%" />
+  <img src="docs/images/wide-task-current.png" alt="TapPilot 当前宽屏任务界面" width="100%" />
   <br />
-  <strong>折叠屏 / 大屏展开态：</strong>左侧保留任务与模块导航，右侧是完整任务时间线。
+  <strong>折叠屏 / 宽屏展开态：</strong>左侧保留能力与最近任务，右侧维持完整的任务时间线和图片上下文。
 </p>
 
 ## 工作方式
@@ -100,6 +123,7 @@ flowchart LR
   Phone["手机 / 折叠屏 PWA"] <-- "Tailscale 私有网络" --> Bridge["TapPilot Bridge\nNode.js"]
   Menu["macOS 菜单栏 App\nSwiftUI"] --> Bridge
   Bridge <-- "结构化 app-server 协议" --> Codex["本机 Codex / ChatGPT"]
+  Bridge <-- "官方 AppleScript" --> Ghostty["Ghostty 终端"]
   Bridge --> Mac["Mac 只读系统信息"]
 ```
 
@@ -107,6 +131,7 @@ flowchart LR
 2. **菜单栏 App 拉起 Bridge**：它启动本地服务，读取 Codex 的结构化任务、Turn、审批、问题与实时事件。
 3. **手机只消费稳定模型**：手机看到的是适合触控的任务语义，而不是截取/模拟 Mac 桌面窗口。
 4. **Tailscale 建立私有访问路径**：手机从 Tailnet 内访问 Mac，不需要公网 IP、端口映射或第三方中转服务器。
+5. **Ghostty 保持终端语义边界**：TapPilot 可读取会话元数据（名称、工作目录）并向你选中的终端粘贴命令；默认会新建一个受控标签页后才启动受记录子 shell。若要接管已有终端，手机会明确显示目标与影响并要求二次确认。它不截屏、不读取接管前历史、不模拟鼠标；vim、htop 等全屏 TUI 不会被伪装成手机桌面。
 
 这意味着：TapPilot 本身不提供“把任务数据上传到自己的云端”的中转服务；但 Codex / ChatGPT 自身所需的联网与账号行为仍遵循你原有的 OpenAI 产品、网络和账号配置。
 
@@ -229,6 +254,18 @@ TapPilot 目前优先使用 PWA，而不是要求先安装原生手机 App。这
 
 TapPilot 使用聊天软件式逻辑：首次进入跳到最新内容；如果你主动上滑看历史，新消息不会把你强行拉回底部，而会出现“有新消息”按钮供你自行回到底部。
 
+## Ghostty 手机终端
+
+Ghostty 不是把 Mac 终端缩放到手机上，而是一个有明确边界的终端适配器。手机只看到它需要看到的会话语义、后续普通命令与受控输出。
+
+1. **先选目标，再开始同步**：页面显示已打开终端与紧凑化后的工作目录；完整本机路径不会作为移动端首要信息暴露。
+2. **默认新建受控标签页**：点击“新建受控终端并同步”后，TapPilot 才在新的 Ghostty 标签页启动记录，避免改动正在工作的终端。
+3. **接管已有终端必须二次确认**：会明确提示目标终端、启动子 shell 的影响与停止后的清理方式。
+4. **输出从接管后开始**：手机只同步本次受控 session 后的普通命令输出；不会读取既有历史或假装成桌面画面。
+5. **保留边界**：命令会粘贴并回车；`vim`、`htop` 等全屏 TUI 产生的控制字符不保证可读，TapPilot 不以截屏/OCR 伪装其行为。
+
+> Ghostty 需要 macOS「自动化」中允许 TapPilot 控制 Ghostty。这个授权只让本机系统允许自动化，不会把 macOS 隐私授权或终端历史绕过到手机端。
+
 ## macOS 菜单栏 App
 
 菜单栏面板是日常使用的控制台，主要提供：
@@ -288,21 +325,24 @@ arch -arm64 swift test
 ./script/build_and_run.sh --verify
 ```
 
-除自动化测试外，发布前应至少手动确认：菜单栏面板能打开、本地/Tailscale 地址健康、手机配对、长对话定位、图片上传和审批卡显示。
+除自动化测试外，发布前应至少手动确认：菜单栏面板能打开、本地/Tailscale 地址健康、手机配对与单设备移除、长对话定位、图片上传和审批卡显示；Ghostty 默认新建受控终端、已有终端二次确认、实时输出与停止清理均应逐项通过。
 
 ## 已知边界
 
 - 首版面向个人私有部署，不提供多用户、团队组织、云端中转或公网访问；
-- 当前主要目标是 Codex；其他应用仅有扩展外壳，尚未等同于已接入；
+- Codex 是主入口；Ghostty 已接入会话、命令和后续普通输出同步。MiniMax Code、Kaku 等仍只是计划入口，不应被视为已可用；
 - Codex `app-server` 仍是实验性接口，TapPilot 通过 Bridge 做兼容层，但上游协议变化仍可能需要适配；
 - 远程审批只能覆盖 Codex 暴露的语义审批，不能绕过 macOS TCC、Finder、钥匙串等原生系统确认；
 - PWA 不是原生手机客户端；是否开发原生客户端取决于后续真实使用场景；
-- 项目尚未附带开源许可证。准备公开发布前，请由仓库所有者选择并添加合适的许可证。
+
+## 开源许可
+
+本项目以 [MIT License](LICENSE) 发布。你可以使用、复制、修改与分发，但须保留版权和许可声明；不提供任何明示或默示担保。
 
 ## 品牌与致谢
 
 TapPilot / 指驭是产品名称与主品牌；ShaneStudio 仅作为发布者归属，不替代产品识别。
 
-<p align="left">
-  <img src="public/brand/shanestudio-wordmark.png" width="160" alt="ShaneStudio" />
+<p align="center">
+  <img src="public/brand/shanestudio-wordmark.png" width="210" alt="ShaneStudio" />
 </p>

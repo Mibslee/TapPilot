@@ -118,6 +118,7 @@ export function ThreadDetail({ thread, approvals, busy, onBack, onSend, onUpload
   const [text, setText] = useState("");
   const [attachments, setAttachments] = useState<UploadAttachment[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [hasNewMessages, setHasNewMessages] = useState(false);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -168,14 +169,19 @@ export function ThreadDetail({ thread, approvals, busy, onBack, onSend, onUpload
 
   async function submit() {
     const value = text.trim();
-    if (!value && !attachments.length) return;
+    if (submitting || uploading || (!value && !attachments.length)) return;
     isNearLatestRef.current = true;
-    const sent = await onSend(value, attachments.map((attachment) => attachment.id));
-    if (!sent) return;
-    unusedAttachmentsRef.current = [];
-    setText("");
-    setAttachments([]);
-    setUploadError("");
+    setSubmitting(true);
+    try {
+      const sent = await onSend(value, attachments.map((attachment) => attachment.id));
+      if (!sent) return;
+      unusedAttachmentsRef.current = [];
+      setText("");
+      setAttachments([]);
+      setUploadError("");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function addImages(files: FileList | null) {
@@ -262,7 +268,7 @@ export function ThreadDetail({ thread, approvals, busy, onBack, onSend, onUpload
       <div className="composer-wrap glass">
         <div className="composer-mode">
           <span>{state === "running" ? "插入正在运行的任务" : "发送后续指令"}</span>
-          <button className="attachment-button pressable" disabled={busy || uploading || attachments.length >= 4} onClick={() => fileInputRef.current?.click()}><Paperclip size={16} />{uploading ? "上传中" : "图片"}</button>
+          <button className="attachment-button pressable" disabled={submitting || uploading || attachments.length >= 4} onClick={() => fileInputRef.current?.click()}><Paperclip size={16} />{uploading ? "上传中" : "图片"}</button>
           <input ref={fileInputRef} className="visually-hidden" type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={(event) => void addImages(event.target.files)} />
         </div>
         {attachments.length > 0 && <div className="attachment-strip">{attachments.map((attachment) => (
@@ -272,7 +278,7 @@ export function ThreadDetail({ thread, approvals, busy, onBack, onSend, onUpload
         <textarea
           rows={2}
           value={text}
-          onChange={(event) => setText(event.target.value)}
+          onInput={(event) => setText(event.currentTarget.value)}
           placeholder="给 Codex 发送消息或指令…"
           onKeyDown={(event) => {
             if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) void submit();
@@ -280,7 +286,7 @@ export function ThreadDetail({ thread, approvals, busy, onBack, onSend, onUpload
         />
         <div className="composer-actions">
           {(state === "running" || state === "waiting") && <button disabled={busy} className="button secondary pressable" onClick={() => void onInterrupt()}><Square size={14} fill="currentColor" />停止</button>}
-          <button disabled={busy || uploading || (!text.trim() && !attachments.length)} className="button primary pressable" onClick={() => void submit()}><Send size={17} />发送</button>
+          <button disabled={submitting || uploading || (!text.trim() && !attachments.length)} className="button primary pressable" onClick={() => void submit()}><Send size={17} />发送</button>
         </div>
       </div>
     </main>
