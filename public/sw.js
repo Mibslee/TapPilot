@@ -1,5 +1,5 @@
-const CACHE = "tappilot-shell-v3";
-const SHELL = ["/", "/manifest.webmanifest", "/brand/shanestudio-mark-192.png"];
+const CACHE = "tappilot-shell-v4";
+const SHELL = ["/", "/manifest.webmanifest", "/icons/tappilot-192.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
